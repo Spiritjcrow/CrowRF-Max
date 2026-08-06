@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "project": "crowrf-max",
+  "target": "unknown",
+  "tasks": [
+    {
+      "id": "protocol",
+      "title": "Define observation and bridge protocols",
+      "dependsOn": [],
+      "approval": "auto",
+      "capabilities": ["json-schema"],
+      "acceptance": ["Schemas validate deterministic fixtures"],
+      "sideEffects": ["Creates protocol files"],
+      "rollback": "Remove only protocol files introduced by this task"
+    },
+    {
+      "id": "android-shell",
+      "title": "Build the Compose Android control plane",
+      "dependsOn": ["protocol"],
+      "approval": "auto",
+      "capabilities": ["android-sdk", "jdk-17"],
+      "acceptance": ["Debug APK compiles", "Capability fallback unit tests pass"],
+      "sideEffects": ["Creates Android project files"],
+      "rollback": "Revert the Android shell commit"
+    },
+    {
+      "id": "unity-renderer",
+      "title": "Build the optional Unity 6 renderer",
+      "dependsOn": ["protocol", "android-shell"],
+      "approval": "auto",
+      "capabilities": ["unity-6", "ar-foundation"],
+      "acceptance": ["Unity project opens without missing packages", "Android library export integrates with the shell"],
+      "sideEffects": ["Creates Unity project and export configuration"],
+      "rollback": "Revert the Unity renderer commit"
+    },
+    {
+      "id": "termux-worker",
+      "title": "Build the authenticated Termux worker",
+      "dependsOn": ["protocol"],
+      "approval": "auto",
+      "capabilities": ["termux", "python3"],
+      "acceptance": ["Allowlisted synthetic task round-trip passes", "Non-allowlisted operations are rejected"],
+      "sideEffects": ["Creates local worker files"],
+      "rollback": "Revert the Termux worker commit"
+    },
+    {
+      "id": "owned-device-smoke",
+      "title": "Run a bounded smoke test on an owned Android device",
+      "dependsOn": ["android-shell"],
+      "approval": "notify",
+      "capabilities": ["adb", "owned-device"],
+      "acceptance": ["App starts offline", "Capability profile is recorded", "Collection can be stopped and app-owned data deleted"],
+      "sideEffects": ["Installs a development APK and creates app-scoped test data"],
+      "rollback": "Uninstall the development package and delete its app-scoped data"
+    }
+  ]
+}
