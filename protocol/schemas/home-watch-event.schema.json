@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crowrf.local/schema/home-watch-event-v1.json",
+  "title": "Home Watch event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocolVersion", "eventId", "capturedAtUtc", "kind", "assessment", "severity", "confidence", "provenance", "indicatorVisible"],
+  "properties": {
+    "protocolVersion": { "const": 1 },
+    "eventId": { "type": "string", "minLength": 1 },
+    "capturedAtUtc": { "type": "string", "format": "date-time" },
+    "kind": { "enum": ["human_vocal", "motion", "door_window", "rf_change"] },
+    "assessment": { "enum": ["household", "unrecognized", "uncertain", "not_applicable"] },
+    "severity": { "enum": ["none", "info", "attention", "urgent"] },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "provenance": { "type": "string", "minLength": 1 },
+    "indicatorVisible": { "const": true },
+    "audioExcerptPresent": { "type": "boolean", "default": false },
+    "retentionExpiresAtUtc": { "type": ["string", "null"], "format": "date-time" },
+    "corroboratingEventIds": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
+  }
+}

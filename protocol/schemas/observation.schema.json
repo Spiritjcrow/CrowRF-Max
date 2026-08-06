@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crowrf.local/schema/observation-v1.json",
+  "title": "CrowRF observation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocolVersion",
+    "observationId",
+    "sessionId",
+    "capturedAtUtc",
+    "elapsedRealtimeNanos",
+    "modality",
+    "source",
+    "value",
+    "unit",
+    "confidence",
+    "provenance"
+  ],
+  "properties": {
+    "protocolVersion": { "const": 1 },
+    "observationId": { "type": "string", "format": "uuid" },
+    "sessionId": { "type": "string", "format": "uuid" },
+    "capturedAtUtc": { "type": "string", "format": "date-time" },
+    "elapsedRealtimeNanos": { "type": "integer", "minimum": 0 },
+    "modality": { "enum": ["wifi", "ble", "imu", "uwb", "geometry", "thermal", "battery"] },
+    "source": { "type": "string", "minLength": 1 },
+    "value": { "type": "number" },
+    "unit": { "type": "string", "minLength": 1 },
+    "frequencyHz": { "type": "number", "exclusiveMinimum": 0 },
+    "channel": { "type": "integer", "minimum": 0 },
+    "identifierHash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "uncertainty": { "type": ["number", "null"], "minimum": 0 },
+    "coordinateFrame": { "type": ["string", "null"] },
+    "calibrationId": { "type": ["string", "null"] },
+    "provenance": { "type": "string", "minLength": 1 },
+    "error": { "type": ["string", "null"] }
+  }
+}
