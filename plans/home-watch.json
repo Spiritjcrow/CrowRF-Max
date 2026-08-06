@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "project": "crowrf-max-home-watch",
+  "target": "owned-device",
+  "tasks": [
+    {
+      "id": "policy",
+      "title": "Implement consent-gated neutral event policy",
+      "dependsOn": [],
+      "approval": "auto",
+      "capabilities": ["kotlin"],
+      "acceptance": ["Policy tests cover consent, household, uncertain, and unrecognized cases"],
+      "sideEffects": ["Creates policy and tests"],
+      "rollback": "Revert Home Watch policy files"
+    },
+    {
+      "id": "foreground-service",
+      "title": "Implement user-armed microphone foreground service",
+      "dependsOn": ["policy"],
+      "approval": "auto",
+      "capabilities": ["android-sdk", "record-audio"],
+      "acceptance": ["Service starts only from visible UI", "Persistent notification includes Stop action"],
+      "sideEffects": ["Adds microphone service and runtime permission flow"],
+      "rollback": "Remove service declaration and service implementation"
+    },
+    {
+      "id": "speaker-enrollment",
+      "title": "Enroll consented household voice profiles locally",
+      "dependsOn": ["foreground-service"],
+      "approval": "confirm",
+      "capabilities": ["owned-device", "microphone"],
+      "acceptance": ["Each profile records consent", "Profile can be deleted independently"],
+      "sideEffects": ["Stores encrypted speaker embeddings"],
+      "rollback": "Delete enrolled embeddings and consent records"
+    },
+    {
+      "id": "remote-push",
+      "title": "Configure encrypted metadata push",
+      "dependsOn": ["policy"],
+      "approval": "confirm",
+      "capabilities": ["network", "push-destination"],
+      "acceptance": ["Remote push is disabled until configured", "Payload contains no audio by default"],
+      "sideEffects": ["Registers a push destination"],
+      "rollback": "Revoke destination token and disable remote push"
+    },
+    {
+      "id": "owned-device-test",
+      "title": "Run bounded Home Watch smoke test",
+      "dependsOn": ["foreground-service"],
+      "approval": "notify",
+      "capabilities": ["adb", "owned-device"],
+      "acceptance": ["Arm and disarm flow works", "Permission loss stops collection", "Events can be deleted"],
+      "sideEffects": ["Installs development build and creates app-scoped fixtures"],
+      "rollback": "Uninstall development build and remove app-scoped data"
+    }
+  ]
+}
